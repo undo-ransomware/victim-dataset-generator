@@ -1,5 +1,26 @@
 ## Ransomware machine learning project
 
+### Generators
+
+#### Install
+
+``pip install -r requirements.txt``
+
+#### Usage
+
+##### Image
+Creates random images of type jpg and png.\
+``ìmage.py <width> <height> <number_of_images>``
+##### PDF
+Downloads 100 pdfs of random article from wikipedia.\
+``pdf.py``
+##### Word
+Creates random word documents.\
+``word.py <number_of_documents>``
+##### ZIP
+Zips all files in the same folder.\
+``zip.py``
+
 ### References
 
 * Kharraz, Amin, et al. "Cutting the gordian knot: A look under the hood of ransomware attacks." International Conference on Detection of Intrusions and Malware, and Vulnerability Assessment. Springer, Cham, 2015.

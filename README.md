@@ -20,6 +20,9 @@ Creates random word documents.\
 ##### ZIP
 Zips all files in the same folder.\
 ``zip.py``
+##### Wikimedia
+Downloads media (random or category) from Wikimedia.
+``wikimedia.py <random|category> <number of random files|wikimedia category>``
 
 ### References
 

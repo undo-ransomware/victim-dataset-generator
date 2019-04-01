@@ -1,5 +1,62 @@
 ## Ransomware machine learning project
 
+### Malware dataset
+
+#### VirusShare
+
+We used the `VirusShare_CryptoRansom_20160715.zip` malware collection from *VirusShare.com*.
+
+#### Meta information
+
+The information were collected via the *VirusTotal.com* academic API.
+
+#### Labels
+
+The labels are created based on the meta information collected from *VirusTotal.com* by the *avclass* (https://github.com/malicialab/avclass) tool.
+
+We modified the tool that it can handle the `json` academic API reports of *VirusTotal.com*.
+
+#### Clean
+
+To clean the `json` reports from linebreaks (necessary for *avclass* to work):
+
+```bash
+#!/bin/bash
+for filename in ./VTDL_VirusShare/*.json; do
+	f="${filename##*/}"
+	(tr '\n' ' '<$filename) >> ./VTDL_VirusShare_clean/$f
+done
+```
+
+##### Modification
+
+Replace the method `get_sample_info` line 61 - 82 in `avclass_common.py` with:
+
+```python
+@staticmethod
+def get_sample_info(vt_rep, from_vt):
+    '''Parse and extract sample information from JSON line
+        Returns a SampleInfo named tuple: md5, sha1, sha256, label_pairs 
+    '''
+    label_pairs = []
+    if from_vt:
+        try:
+            scans = vt_rep['data']['attributes']['last_analysis_results']
+        except KeyError:
+            return None
+        for av, res in scans.items():
+            if res['category'] == 'malicious':
+                label = res['result']
+                clean_label = filter(lambda x: x in string.printable, 
+                                    label).strip().encode('utf-8').strip()
+                label_pairs.append((av, clean_label))
+    else:
+        label_pairs = vt_rep['av_labels']
+
+    return SampleInfo(vt_rep['data']['attributes']['md5'], vt_rep['data']['attributes']['sha1'], vt_rep['data']['attributes']['sha256'],
+                           label_pairs) 
+```
+
 ### Generators
 
 #### Install

@@ -36,7 +36,7 @@ Replace the method `get_sample_info` line 61 - 82 in `avclass_common.py` with:
 @staticmethod
 def get_sample_info(vt_rep, from_vt):
     '''Parse and extract sample information from JSON line
-        Returns a SampleInfo named tuple: md5, sha1, sha256, label_pairs 
+        Returns a SampleInfo named tuple: md5, sha1, sha256, label_pairs
     '''
     label_pairs = []
     if from_vt:

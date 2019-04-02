@@ -1,34 +1,34 @@
-## Ransomware machine learning project
+# Ransomware machine learning project
 
-### Malware dataset
+## Malware dataset
 
-#### VirusShare
+### VirusShare
 
 We used the `VirusShare_CryptoRansom_20160715.zip` malware collection from *VirusShare.com*.
 
-#### Meta information
+### Meta information
 
 The information were collected via the *VirusTotal.com* academic API.
 
-#### Labels
+### Labels
 
-The labels are created based on the meta information collected from *VirusTotal.com* by the *avclass* (https://github.com/malicialab/avclass) tool.
+The labels are created based on the meta information collected from *VirusTotal.com* by the *avclass* (<https://github.com/malicialab/avclass)> tool.
 
 We modified the tool that it can handle the `json` academic API reports of *VirusTotal.com*.
 
-#### Clean
+### Clean
 
 To clean the `json` reports from linebreaks (necessary for *avclass* to work):
 
 ```bash
 #!/bin/bash
 for filename in ./VTDL_VirusShare/*.json; do
-	f="${filename##*/}"
-	(tr '\n' ' '<$filename) >> ./VTDL_VirusShare_clean/$f
+    f="${filename##*/}"
+    (tr '\n' ' '<$filename) >> ./VTDL_VirusShare_clean/$f
 done
 ```
 
-##### Modification
+### Modification
 
 Replace the method `get_sample_info` line 61 - 82 in `avclass_common.py` with:
 
@@ -47,41 +47,50 @@ def get_sample_info(vt_rep, from_vt):
         for av, res in scans.items():
             if res['category'] == 'malicious':
                 label = res['result']
-                clean_label = filter(lambda x: x in string.printable, 
+                clean_label = filter(lambda x: x in string.printable,
                                     label).strip().encode('utf-8').strip()
                 label_pairs.append((av, clean_label))
     else:
         label_pairs = vt_rep['av_labels']
 
     return SampleInfo(vt_rep['data']['attributes']['md5'], vt_rep['data']['attributes']['sha1'], vt_rep['data']['attributes']['sha256'],
-                           label_pairs) 
+                           label_pairs)
 ```
 
-### Generators
+## Generators
 
-#### Install
+### Install
 
 ``pip install -r requirements.txt``
 
-#### Usage
+### Usage
 
-##### Image
+#### Image
+
 Creates random images of type jpg and png.\
 ``ìmage.py <width> <height> <number_of_images>``
-##### PDF
+
+#### PDF
+
 Downloads 100 pdfs of random article from wikipedia.\
 ``pdf.py``
-##### Word
+
+#### Word
+
 Creates random word documents.\
 ``word.py <number_of_documents>``
-##### ZIP
+
+#### ZIP
+
 Zips all files in the same folder.\
 ``zip.py``
-##### Wikimedia
+
+#### Wikimedia
+
 Downloads media (random or category) from Wikimedia.\
 ``wikimedia.py <random|category> <number of random files|wikimedia category>``
 
-### References
+## References
 
 * Kharraz, Amin, et al. "Cutting the gordian knot: A look under the hood of ransomware attacks." International Conference on Detection of Intrusions and Malware, and Vulnerability Assessment. Springer, Cham, 2015.
 * Kharaz, Amin, et al. "{UNVEIL}: A Large-Scale, Automated Approach to Detecting Ransomware." 25th {USENIX} Security Symposium ({USENIX} Security 16). 2016.

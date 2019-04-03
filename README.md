@@ -10,6 +10,42 @@ We used the `VirusShare_CryptoRansom_20160715.zip` malware collection from *Viru
 
 The information were collected via the *VirusTotal.com* academic API.
 
+#### VirusTotal API
+
+We used the *VirusTotalApi* (<https://github.com/doomedraven/VirusTotalApi>) script to access the VirusTotal API.
+
+#### Create list with malware samples
+
+```bash
+ls VirusShare | grep *.txt > samples.txt
+```
+
+#### VirusTotal script
+
+This script reads the first line of the file provided by paramter `$1` and executes a API requests via the `VirusTotalApi` python script. Afterwards it removes the line of the file.
+
+```bash
+#!/bin/bash
+
+line=$(head -n 1 $1)
+echo $line
+python ./vt/vt.py -f -j --allinfo ./VirusShare/$line
+tail -n +2 "$1" > "$1.tmp" && mv "$1.tmp" "$1"
+```
+
+#### Cronjob configuration
+
+Execute the `vt.sh` script every 10 seconds.
+
+```bash
+ * * * * * ( vt.sh samples.txt >> /tmp/vt.log 2>&1 )
+ * * * * * ( sleep 10 ; vt.sh samples.txt >> /tmp/vt.log 2>&1 )
+ * * * * * ( sleep 20 ; vt.sh samples.txt >> /tmp/vt.log 2>&1 )
+ * * * * * ( sleep 30 ; vt.sh samples.txt >> /tmp/vt.log 2>&1 )
+ * * * * * ( sleep 40 ; vt.sh samples.txt >> /tmp/vt.log 2>&1 )
+ * * * * * ( sleep 50 ; /vt.sh samples.txt >> /tmp/vt.log 2>&1 )
+```
+
 ### Labels
 
 The labels are created based on the meta information collected from *VirusTotal.com* by the *avclass* (<https://github.com/malicialab/avclass)> tool.

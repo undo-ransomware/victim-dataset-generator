@@ -93,6 +93,19 @@ def get_sample_info(vt_rep, from_vt):
                            label_pairs)
 ```
 
+### Bar plot
+
+Just execute the python script `barplot.py`. It will analyse the informations in `all.labels` and filter the data.
+
+Filters
+
+* Removes all samples with `SINGLETON` in the name.
+* A group of samples is a family if it has more than 100 samples all others will not be plotted.
+
+#### Example
+
+![Ransomware families](/malware-dataset/families.png)
+
 ## Generators
 
 ### Install

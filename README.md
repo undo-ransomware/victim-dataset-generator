@@ -6,6 +6,11 @@
 
 We used the `VirusShare_CryptoRansom_20160715.zip` malware collection from *VirusShare.com*.
 
+### VirusShare labeled hashes
+
+A dataset of hashes with labels of all *VirusShare.com* samples exists: (<https://drive.google.com/drive/folders/0B_IN6RzP69b2WC1wUjNqajYxRXM>).
+Collected by John Seymour.
+
 ### Meta information
 
 The information were collected via the *VirusTotal.com* academic API.

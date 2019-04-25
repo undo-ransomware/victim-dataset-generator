@@ -19,7 +19,6 @@ def download_random_file():
 	time.sleep(1)
 	
 def download_category_files(category_name):
-	category_name = "Audio_files_of_music"
 	category = site.Categories[category_name]
 	for x in category.members(namespace=6):
 		file = site.images[x.page_title]

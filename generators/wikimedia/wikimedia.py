@@ -19,6 +19,9 @@ def download(filename):
 	basename, extension = os.path.splitext(filename)
 	localname = slugify(basename, max_length=150)
 	print 'Downloading to: ' + localname + extension
+	with open('./media/' + localname + ".txt", 'w') as fd:
+		fd.write(("File:" + filename + "\n").encode("utf-8"))
+		fd.write(file.text().encode("utf-8"))
 	with open('./media/' + localname + extension, 'wb') as fd:
 		file.download(fd)
 	time.sleep(1)

@@ -11,6 +11,8 @@ import string
 from lxml import etree
 import json
 import urllib
+from datetime import datetime
+import io
 
 site = Site('commons.wikimedia.org')
 
@@ -19,9 +21,12 @@ def download(filename):
 	basename, extension = os.path.splitext(filename)
 	localname = slugify(basename, max_length=150)
 	print 'Downloading to: ' + localname + extension
-	with open('./media/' + localname + ".txt", 'w') as fd:
-		fd.write(("File:" + filename + "\n").encode("utf-8"))
-		fd.write(file.text().encode("utf-8"))
+	with io.open('./media/' + localname + ".yaml", 'w', encoding='utf-8') as fd:
+		fd.write(u"source: " + site.host + "\n")
+		fd.write(u"file: " + filename + "\n")
+		fd.write(u"date: " + str(datetime.now()) + "\n")
+		fd.write(u"text: |\n")
+		fd.write(u"".join("  " + line for line in file.text().splitlines(True)))
 	with open('./media/' + localname + extension, 'wb') as fd:
 		file.download(fd)
 	time.sleep(1)
@@ -37,6 +42,10 @@ def download_category_files(category_name):
 		download(x.page_title)
 	
 def download_category_random(category_name):
+	# screenscrape the category frontend since the API doesn't offer a way to randomly
+	# sample a category. fully downloading the category using the API and then sampling
+	# locally would work, but for large categories like CC-Zero would create more load
+	# than screenscraping.
 	start = ''.join(random.choice(string.ascii_lowercase) for x in range(0,10))
 	r = requests.get("https://commons.wikimedia.org/wiki/Category:" + category_name + "?from=" + start)
 	xml = etree.fromstring(r.text)

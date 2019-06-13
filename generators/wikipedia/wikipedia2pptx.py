@@ -29,7 +29,7 @@ def convert(xml, prs, metalog, source):
 		else:
 			header = title
 		
-		for figure in section.xpath('figure'):
+		for figure in section.xpath('figure|figure-inline'):
 			caption = sectiontext(figure.xpath(".//figcaption")[0])
 			src = re.sub('^.*?File:', '', figure.xpath(".//a//img/@resource")[0])
 
@@ -64,7 +64,7 @@ def record_metadata(metalog, site, filename):
 def download(page_title):
 	prs = Presentation()
 	with io.open(page_title + ".yaml", 'w', encoding='utf-8') as metalog:
-		r = requests.get("https://en.wikipedia.org/api/rest_v1/page/html/" + page_title)
+		r = requests.get("https://en.wikipedia.org/api/rest_v1/page/html/" + quote(page_title))
 		xml = etree.fromstring(r.text)
 		rev = xml.xpath("/html/@about")[0]
 		record_metadata(metalog, "en.wikipedia.org", page_title)

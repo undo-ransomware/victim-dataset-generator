@@ -13,27 +13,27 @@ def link(text, href, tail):
 	return a
 
 def download(page_title):
-	with io.open(page_title + ".yaml", 'w', encoding='utf-8') as metalog:
-		r = requests.get("https://en.wikipedia.org/api/rest_v1/page/html/" + page_title)
-		xml = etree.fromstring(r.text)
-		rev = xml.xpath("/html/@about")[0]
-		metalog.write(u"source: en.wikipedia.org\n")
-		metalog.write(u"file: " + page_title + "\n")
-		metalog.write(u"date: " + str(datetime.now()) + "\n")
-		metalog.write(u"version: " + rev)
-		header = etree.Element("h1")
-		header.text = page_title
-		xml.insert(0, header)
+	r = requests.get("https://en.wikipedia.org/api/rest_v1/page/html/" + quote(page_title))
+	xml = etree.fromstring(r.text)
+	rev = xml.xpath("/html/@about")[0]
+	# remove external resources to keep pandoc from downloading them
+	for fig in xml.xpath('//figure|//figure-inline|//img|//link[@rel="stylesheet"]|//script'):
+		fig.xpath("..")[0].remove(fig)
 
-		xml.append(etree.Element("hr"))
-		p = etree.Element("p")
-		p.append(link("From Wikipedia, the free encyclopedia",
-			"https://en.wikipedia.org/wiki/" + quote(page_title),
-			", and licensed under "))
-		p.append(link("CC BY-SA 3.0", LICENSE, "."))
-		xml.append(p)
-		with io.open(page_title + ".html", 'w', encoding='utf-8') as html:
-			html.write(etree.tostring(xml).decode("utf-8"))
+	# attribution footer (to fulfill CC BY-SA)
+	body = xml.xpath("//body")[0]
+	body.append(etree.Element("hr"))
+	p = etree.Element("p")
+	p.append(link("From Wikipedia, the free encyclopedia",
+		"https://en.wikipedia.org/wiki/" + quote(page_title),
+		", and licensed under "))
+	p.append(link("CC BY-SA 3.0", LICENSE, ". "))
+	p.append(link("Version as of " + str(datetime.now()) + ".", rev, ""))
+	body.append(p)
+
+	with io.open(page_title + ".html", 'w', encoding='utf-8') as html:
+		html.write(u"<!DOCTYPE html>")
+		html.write(etree.tostring(xml).decode("utf-8"))
 
 def main(args):
 	for arg in args:

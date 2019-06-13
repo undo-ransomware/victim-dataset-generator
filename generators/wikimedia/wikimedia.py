@@ -94,9 +94,9 @@ def main(args):
 	else:
 		print "random <number of random files>"
 		print "category <wikimedia category>"
-		print "randomcat <number of random files> <wikimedia category>"
+		print "randomcat <wikimedia category> <number of random files>"
 		print "search <search query>"
-		print "randomsearch <number of random files> <search query>"
+		print "randomsearch <search query> <number of random files>"
 
 if __name__ == "__main__":
     status = main(sys.argv[1:])

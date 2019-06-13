@@ -62,6 +62,9 @@ def record_metadata(metalog, site, filename):
 	metalog.write(u"date: " + str(datetime.now()) + "\n")
 
 def download(page_title):
+	if os.path.isfile(page_title + ".pptx"):
+		return
+
 	prs = Presentation()
 	with io.open(page_title + ".yaml", 'w', encoding='utf-8') as metalog:
 		r = requests.get("https://en.wikipedia.org/api/rest_v1/page/html/" + quote(page_title))

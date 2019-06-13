@@ -1,6 +1,7 @@
 import requests
 from lxml import etree
 import io
+import os
 from datetime import datetime
 from urllib import quote
 
@@ -13,6 +14,9 @@ def link(text, href, tail):
 	return a
 
 def download(page_title):
+	if os.path.isfile(page_title + ".html"):
+		return
+
 	r = requests.get("https://en.wikipedia.org/api/rest_v1/page/html/" + quote(page_title))
 	xml = etree.fromstring(r.text)
 	rev = xml.xpath("/html/@about")[0]

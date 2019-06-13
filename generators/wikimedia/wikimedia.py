@@ -20,15 +20,18 @@ site = Site('commons.wikimedia.org')
 def download(filename):
 	file = site.images[filename]
 	basename, extension = os.path.splitext(filename)
-	localname = slugify(basename, max_length=150)
+	localname = "media/" + slugify(basename, max_length=150)
+	if os.path.isfile(localname):
+		return
+
 	print 'Downloading to: ' + localname + extension
-	with io.open('./media/' + localname + ".yaml", 'w', encoding='utf-8') as fd:
+	with io.open(localname + ".yaml", 'w', encoding='utf-8') as fd:
 		fd.write(u"source: " + site.host + "\n")
 		fd.write(u"file: " + filename + "\n")
 		fd.write(u"date: " + str(datetime.now()) + "\n")
 		fd.write(u"text: |\n")
 		fd.write(u"".join("  " + line for line in file.text().splitlines(True)))
-	with open('./media/' + localname + extension, 'wb') as fd:
+	with open(localname + extension, 'wb') as fd:
 		file.download(fd)
 	time.sleep(1)
 

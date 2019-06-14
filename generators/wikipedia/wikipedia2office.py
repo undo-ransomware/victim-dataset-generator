@@ -2,25 +2,29 @@ import requests
 from lxml import etree
 import re
 from presentify import Presentation
-from summarizer import extract_keywords, summarize
+from wordify import TextDocument
 from mwclient import Site
 import os
 import io
 from datetime import datetime
 from slugify import slugify
 from urllib import quote
+from tempfile import mkstemp
+from PIL import Image
+from resizeimage import resizeimage
 
 commons = Site('commons.wikimedia.org')
+LICENSE = "https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License"
 
 def sectiontext(elem):
 	return "".join(elem.xpath("*[not(@class) or @class!='mw-ref']//text()|text()"))
 
-def convert(xml, prs, metalog, source):
+def convert(xml, sinks, metalog, source):
 	title = " ".join(xml.xpath("//title//text()"))
-	prs.make_title(title, "From Wikipedia, the free encyclopedia", source,
-		"Licensed unter CC BY-SA 3.0",
-		"https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License");
-	keywords = extract_keywords(xml.xpath("//section//text()"))
+	for sink in sinks:
+		sink.make_title(title, "From Wikipedia, the free encyclopedia", source,
+			"Licensed under CC BY-SA 3.0:", LICENSE);
+		sink.init_full_text(xml.xpath("//section//text()"))
 	
 	for section in xml.xpath("//section"):
 		headers = section.xpath("*[starts-with(name(),'h')]//text()")
@@ -30,10 +34,17 @@ def convert(xml, prs, metalog, source):
 			header = title
 		
 		for figure in section.xpath('figure|figure-inline'):
-			caption = sectiontext(figure.xpath(".//figcaption")[0])
-			src = re.sub('^.*?File:', '', figure.xpath(".//a//img/@resource")[0])
+			caption = [sectiontext(c) for c in figure.xpath(".//figcaption")]
+			res = figure.xpath(".//a//img/@resource")
+			if len(res) == 0:
+				continue
+			src = re.sub('^.*?File:', '', res[0])
 
 			basename, ext = os.path.splitext(src)
+			if ext.lower() in ['.svg', '.gif']:
+				# SVG is not supported by PIL
+				# GIF tends to be animated, which invariably doesn't work
+				continue
 			localname = "media/" + slugify(basename, max_length=150) + ext
 			file = commons.images[src]
 			meta = file.text()
@@ -48,13 +59,16 @@ def convert(xml, prs, metalog, source):
 			record_metadata(metalog, commons.host, src)
 			metalog.write(u"text: |\n")
 			metalog.write(u"".join("  " + line for line in file.text().splitlines(True)))
-			summary = "".join(summarize([caption], keywords, 60))
-			prs.make_image(localname, summary)
+			temp = mkstemp(suffix=os.path.splitext(localname)[1])[1]
+			with Image.open(localname) as img:
+				resizeimage.resize_thumbnail(img, [1200, 750]).save(temp)
+			for sink in sinks:
+				sink.make_image(temp, caption)
+			os.remove(temp)
 		
 		text = [sectiontext(p) for p in section.xpath("p|ul/li|ol/li|dl/dt|dl/dd")]
-		summary = summarize(text, keywords, 300)
-		if len(summary) > 0:
-			prs.make_bulleted(header, summary)
+		for sink in sinks:
+			sink.make_section(header, text)
 
 def record_metadata(metalog, site, filename):
 	metalog.write(u"source: " + site + "\n")
@@ -62,10 +76,10 @@ def record_metadata(metalog, site, filename):
 	metalog.write(u"date: " + str(datetime.now()) + "\n")
 
 def download(page_title):
-	if os.path.isfile(page_title + ".pptx"):
+	if os.path.isfile(page_title + ".yaml"):
 		return
 
-	prs = Presentation()
+	sinks = [Presentation(), TextDocument()]
 	with io.open(page_title + ".yaml", 'w', encoding='utf-8') as metalog:
 		r = requests.get("https://en.wikipedia.org/api/rest_v1/page/html/" + quote(page_title))
 		xml = etree.fromstring(r.text)
@@ -73,8 +87,9 @@ def download(page_title):
 		record_metadata(metalog, "en.wikipedia.org", page_title)
 		metalog.write(u"version: " + rev)
 		source = u"https://en.wikipedia.org/wiki/" + quote(page_title)
-		convert(xml, prs, metalog, source)
-	prs.save(page_title + ".pptx")
+		convert(xml, sinks, metalog, source)
+	for sink in sinks:
+		sink.save(page_title)
 
 def main(args):
 	for arg in args:

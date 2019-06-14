@@ -7,3 +7,4 @@ requests==2.21.0
 nltk==3.4.3
 python-resize-image==1.1.19
 urllib3==1.24.1
+python-docx==0.8.10

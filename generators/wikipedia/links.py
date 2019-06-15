@@ -4,7 +4,7 @@ site = Site("en.wikipedia.org")
 
 def list(page_title):
 	for link in site.pages[page_title].links(namespace=0, generator=False):
-		print link
+		print link.encode("utf-8")
 
 def main(args):
 	for arg in args:

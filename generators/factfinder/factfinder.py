@@ -90,7 +90,7 @@ def main(args):
 	elif args[0] == 'random':
 		sample(session, int(args[1]))
 	else:
-		print "index (download census.json; takes forever and is 24MB)"
+		print "index (download census.json; takes ~50s and uses ~24MB)"
 		print "random <number of IDs> (random sampling from index)"
 		print "download <id...> (download dataset by ID; needs index)"
 

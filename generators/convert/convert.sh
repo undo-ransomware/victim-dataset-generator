@@ -2,7 +2,7 @@
 #sudo apt install libreoffice pandoc ffmpeg
 rm -rf media
 mkdir media converted
-ln -s ../wikipedia/*.{docx,pptx,yaml} ../wikimedia/media/*.{ogg,oga,webm,ogv} ../factfinder/media/*.csv media
+ln ../wikipedia/*.{docx,pptx,yaml} ../wikimedia/media/*.{ogg,oga,webm,ogv} ../factfinder/media/*.csv media
 for file in media/*.docx; do
 	name="${file##*/}"
 	name="converted/${name%.docx}"

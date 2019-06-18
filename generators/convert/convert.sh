@@ -15,10 +15,14 @@ for file in media/*.docx; do
 	[ -s "$name.txt" ] || libreoffice --convert-to txt:Text --outdir converted "$file"
 done
 for file in media/*.pptx; do
+	name="${file##*/}"
+	name="converted/${name%.*}"
 	[ -s "$name.ppt" ] || libreoffice --convert-to 'ppt:MS PowerPoint 97' --outdir converted "$file"
 	[ -s "$name.odp" ] || libreoffice --convert-to odp:impress8 --outdir converted "$file"
 done
 for file in media/*.csv; do
+	name="${file##*/}"
+	name="converted/${name%.*}"
 	[ -s "$name.xls" ] || libreoffice --convert-to 'xls:MS Excel 97' --outdir converted "$file"
 	[ -s "$name.xlsx" ] || libreoffice --convert-to 'xlsx:Calc MS Excel 2007 XML' --outdir converted "$file"
 	[ -s "$name.ods" ] || libreoffice --convert-to ods:calc8 --outdir converted "$file"

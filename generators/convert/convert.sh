@@ -1,6 +1,6 @@
 #!/bin/bash
 #sudo apt install libreoffice pandoc ffmpeg
-rm -rf media
+rm -rf media converted
 mkdir media converted
 ln ../wikipedia/*.{docx,pptx,yaml} ../wikimedia/media/*.{ogg,oga,webm,ogv} ../factfinder/media/*.csv media
 for file in media/*.docx; do
@@ -13,7 +13,6 @@ for file in media/*.docx; do
 	libreoffice --convert-to odt:writer8 --outdir converted "$file"
 	libreoffice --convert-to pdf:writer_pdf_Export --outdir converted "$file"
 	libreoffice --convert-to txt:Text --outdir converted "$file"
-	libreoffice --convert-to html:writerglobal8_HTML --outdir converted "$file" # FIXME no images
 done
 for file in media/*.pptx; do
 	libreoffice --convert-to 'ppt:MS PowerPoint 97' --outdir converted "$file"

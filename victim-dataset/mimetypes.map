@@ -32,8 +32,19 @@ application/pdf|$|pdf|
 application/zip|$|zip|
 application/x-compressed|$|tgz|horrible choice of mimetype
 application/x-compressed|application/x-gzip|gz|probably tar.gz, given the sizes
+application/x-compressed|application/x-tar|tar|commonly done when files are incompressible anyway
 application/x-rar-compressed|$|rar|
-#image/gif|$|gif|probably web assets (many small ones)
-#application/javascript|$|js|probably web assets
-#text/css|$|css|probably web assets
-#application/x-php|$|php|wtf?
+image/gif|$|gif|probably web assets (many small ones)
+application/javascript|$|js|probably web assets
+text/css|$|css|probably web assets
+application/x-php|$|php|wtf?
+image/tiff|$|tif|
+application/xml|$|xml|
+text/rtf|$|rtf|
+application/postscript|$|ps|
+text/x-c|$|c|
+text/x-c|text/x-h|h|
+text/x-c|text/x-c++src|cpp|
+text/x-python|$|py|
+audio/wav|$|wav|
+audio/wav|audio/flac|flac|

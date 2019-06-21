@@ -11,7 +11,9 @@ labels=c(round(10^(0:29/10)),
 maxk=round(max(files$count)/1000)
 
 pdf('temp.pdf', 20, 14)
-plot(c(0,105), c(0, 1000*maxk), type='n', axes=F, xlab='filesize', ylab='count')
+#plot(c(0,105), c(0, 1000*maxk), type='n', axes=F, xlab='filesize', ylab='count')
+# usable range: 100 bytes to 100MB
+plot(c(20,80), c(0, 1000*maxk), type='n', axes=F, xlab='filesize', ylab='count')
 
 axis(1, 0:109, labels=labels, las=3)
 abline(v=10*log10(10^(0:10)), col='#cccccc')
@@ -21,7 +23,7 @@ abline(v=10*log10(temp$x*temp$y), lty=2, col='#cccccc')
 axis(2, at=1000*0:maxk, labels=paste(0:maxk, 'k', sep=''), las=2)
 abline(h=1000*0:maxk, col='#cccccc')
 
-#colors=brewer.pal(8,'Set1')
+# colors=brewer.pal(8,'Set1') but without yellow
 colors=c('#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#a65628','#f781bf')
 x=0
 for (level in levels(files$ext)) {

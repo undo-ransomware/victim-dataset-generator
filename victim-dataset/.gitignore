@@ -1,3 +1,4 @@
 *.pdf
 temp.*
-mimetypes.unmapped
+*.unmapped
+*.mimetypes.txt

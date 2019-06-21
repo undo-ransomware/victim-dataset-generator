@@ -30,4 +30,10 @@ application/vnd.openxmlformats-officedocument.spreadsheetml|$%|xlsx|
 application/vnd.openxmlformats-officedocument.wordprocessingml|$%|docx|
 application/pdf|$|pdf|
 application/zip|$|zip|
+application/x-compressed|$|tgz|horrible choice of mimetype
+application/x-compressed|application/x-gzip|gz|probably tar.gz, given the sizes
 application/x-rar-compressed|$|rar|
+#image/gif|$|gif|probably web assets (many small ones)
+#application/javascript|$|js|probably web assets
+#text/css|$|css|probably web assets
+#application/x-php|$|php|wtf?

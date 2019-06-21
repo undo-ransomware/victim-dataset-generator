@@ -1,0 +1,33 @@
+to|from|ext|comment
+video/mp4|$|mp4|
+video/mp4|video/3gp|3gp|usually h264 like mp4
+video/mpeg|$|mpeg|might also be MPEG-1
+video/mpeg|video/dvd|vob|MPEG-2 specified by standard
+video/mpeg|video/MP2T|mts|guessing MPEG-2
+video/ogg|$|ogv|super rare
+video/webm|$|webm|rare
+audio/mp4|$|m4a|basically aac
+audio/mpeg|$|mp3|
+audio/ogg|$|ogg|and oga
+image/jpeg|$|jpg|and jpeg
+image/png|$|png|
+image/svg+xml|$|svg|
+text/markdown|$|md|and markdown
+text/html|$|html|and htm
+text/plain|$|txt|but also conf and cnf
+application/x-tex|$|tex|
+text/csv|$|csv|
+application/vnd.ms-excel|$%|xls|
+application/vnd.ms-powerpoint|$%|ppt|
+application/msword|$|doc|and dot – historical special case?
+application/msword|application/vnd.ms-word%|docm|
+application/vnd.oasis.opendocument.graphics|$%|odg|
+application/vnd.oasis.opendocument.presentation|$%|odp|
+application/vnd.oasis.opendocument.spreadsheet|$%|ods|
+application/vnd.oasis.opendocument.text|$%|odt|
+application/vnd.openxmlformats-officedocument.presentationml|$%|pptx|
+application/vnd.openxmlformats-officedocument.spreadsheetml|$%|xlsx|
+application/vnd.openxmlformats-officedocument.wordprocessingml|$%|docx|
+application/pdf|$|pdf|
+application/zip|$|zip|
+application/x-rar-compressed|$|rar|

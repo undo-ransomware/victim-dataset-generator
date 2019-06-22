@@ -14,13 +14,20 @@ pdf('temp.pdf', 20, 14)
 
 mkplot = function(levels, title, range=c(20,73)) {
 	maxk = 0
+	count = 0
+	size = 0
 	for (level in levels) {
-		maxk=max(files[files$ext==level,]$count, maxk)
+		segment = files[files$ext==level,]
+		maxk = max(segment$count, maxk)
+		count = count + sum(segment$count)
+		size = size + sum(10^(segment$dbb / 10) * segment$count)
 	}
 	maxk = maxk / 1000
+	size = round(size / 1000000)
 	#plot(c(0,105), c(0, 1000*maxk), type='n', axes=F, xlab='filesize', ylab='count')
 	# usable range: 100 bytes to ~20MB. there's a long tail with a few huge files
-	plot(range, c(0, 1000*maxk), type='n', axes=F, xlab='filesize', ylab='count', main=title)
+	plot(range, c(0, 1000*maxk), type='n', axes=F, xlab='filesize', ylab='count',
+		main=paste(title, ' (', count, ' files, ', size, ' MB)', sep=''))
 
 	axis(1, 0:109, labels=labels, las=3)
 	abline(v=10*log10(10^(0:10)), col='#cccccc')
@@ -46,11 +53,11 @@ mkplot = function(levels, title, range=c(20,73)) {
 mkplot(levels(files$ext), 'all files (except prefiltered)')
 mkplot(c('doc','docx','odt','rtf','xls','xlsx','ods','csv','ppt','pptx','odp'), '"productivity" (office) files')
 mkplot(c('doc','docx','odt','rtf'), '"productivity" (office) files: word processor')
-mkplot(c('xls','xlsx','ods','csv'), '"productivity" (office) files: spreadsheets')
+mkplot(c('xls','xlsx','ods'), '"productivity" (office) files: spreadsheets')
 mkplot(c('ppt','pptx','odp'), '"productivity" (office) files: presentations', c(43, 90))
-mkplot(c('jpg','png','pdf','ps','tif'), 'images, PDFs and likely scanned stuff')
+mkplot(c('txt','md','tex','csv','xml','html'), 'plaintext office-like formats')
+mkplot(c('jpg','png','bmp','pdf','ps','tif'), 'images, PDFs and likely scanned stuff')
 mkplot(c('zip','tgz','rar'), 'archives', c(30, 105))
-mkplot(c('html','js','css','gif','php','png','svg'), 'saved websites and probable website resources', c(17, 60))
-mkplot(c('txt','md','tex','csv','xml'), 'plaintext office-like formats')
 mkplot(c('m4a','mp3','ogg','wav','mp4','mpeg','ogv','webm'), 'media files', c(40, 95))
-mkplot(c('c','py'), 'source code')
+mkplot(c('html','js','css','gif','php','png','svg'), 'curiosities: saved websites and probable website resources', c(17, 60))
+mkplot(c('c','py','java'), 'curiosities: source code')

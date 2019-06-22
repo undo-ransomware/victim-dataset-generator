@@ -2,3 +2,5 @@
 temp.*
 *.unmapped
 *.mimetypes.txt
+*.storage.txt
+log10.so

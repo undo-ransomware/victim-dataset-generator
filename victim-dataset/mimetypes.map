@@ -48,3 +48,6 @@ text/x-c|text/x-c++src|cpp|
 text/x-python|$|py|
 audio/wav|$|wav|
 audio/wav|audio/flac|flac|
+text/x-java-source|$|java|
+application/octet-stream|$|(unidentified)|
+image/bmp|$|bmp|

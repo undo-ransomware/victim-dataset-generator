@@ -1,19 +1,23 @@
-TARGETS=uni.pdf fratz.pdf uni.mimetypes.txt fratz.mimetypes.txt
+TARGETS=$(foreach inst,uni fratz,$(inst).pdf $(inst).summary.psv $(inst).mimetypes.txt $(inst).storage.txt)
 
 all: $(TARGETS)
 
 clean:
 	rm -f $(TARGETS) log10.so
 
-%.pdf: %.psv
+%.summary.psv: %.psv
 	cp $< temp.psv
 	sqlite3 -batch :memory: '.read filesizes.sql'
+	mv temp.psv $*.summary.psv
+
+%.pdf: %.summary.psv
+	cp $< temp.psv
 	R --no-save -f filesize.r
 	mv temp.pdf $@
 	mv temp.unmapped $*.unmapped
 	rm temp.psv
 
-%.mimetypes.txt: %.psv log10.so
+%.mimetypes.txt %.storage.txt: %.psv log10.so
 	cp $< temp.psv
 	sqlite3 -batch :memory: '.read mimetypes.sql'
 	mv temp.mimetypes.txt $*.mimetypes.txt

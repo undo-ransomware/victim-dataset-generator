@@ -1,6 +1,7 @@
 *.pdf
 temp.*
 *.unmapped
+*.summary.psv
 *.mimetypes.txt
 *.storage.txt
 log10.so

@@ -33,10 +33,11 @@ pffmpeg() {
 	ffmpeg "$@" &
 }
 
-for file in media/*.{ogg,oga}; do
+rename s/oga$/ogg/ media/*.oga
+for file in media/*.ogg; do
 	name="${file##*/}"
 	name="converted/${name%.*}"
-	[ -s "$name.aac" ] || pffmpeg -i "$file" -c:a aac "$name.aac"
+	[ -s "$name.m4a" ] || pffmpeg -i "$file" -c:a aac "$name.m4a"
 	[ -s "$name.mp3" ] || pffmpeg -i "$file" -c:a mp3 "$name.mp3"
 done
 for file in media/*.{webm,ogv}; do
@@ -46,5 +47,5 @@ for file in media/*.{webm,ogv}; do
 	[ -s "$name.webm" ] || [ $ext == webm ] || pffmpeg -i "$file" -c:v libvpx-vp9 -c:a libopus -y "$name.webm"
 	[ -s "$name.ogv" ] || [ $ext == ogv ] || pffmpeg -i "$file" -c:v libtheora -c:a libvorbis -y "$name.ogv"
 	[ -s "$name.mp4" ] || pffmpeg -i "$file" -c:v h264 -c:a aac -y "$name.mp4"
-	[ -s "$name.mpeg" ] || pffmpeg -i "$file" -c:v mpeg2video -c:a ac3 -f vob -y "$name.mpeg"
+	[ -s "$name.mts" ] || pffmpeg -i "$file" -c:v mpeg2video -c:a ac3 -f vob -y "$name.mts"
 done

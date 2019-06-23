@@ -1,9 +1,9 @@
 to|from|ext|comment
 video/mp4|$|mp4|
 video/mp4|video/3gp|3gp|usually h264 like mp4
-video/mpeg|$|mpeg|might also be MPEG-1
-video/mpeg|video/dvd|vob|MPEG-2 specified by standard
-video/mpeg|video/MP2T|mts|guessing MPEG-2
+video/MP2T|$|mts|guessing MPEG-2
+video/MP2T|video/mpeg|mpeg|might also be MPEG-1
+video/MP2T|video/dvd|vob|MPEG-2 as specified by standard
 video/ogg|$|ogv|super rare
 video/webm|$|webm|rare
 audio/mp4|$|m4a|basically aac

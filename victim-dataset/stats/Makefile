@@ -5,19 +5,19 @@ all: $(TARGETS)
 clean:
 	rm -f $(TARGETS) log10.so
 
-%.summary.psv: %.psv
+%.summary.psv: %.psv filesizes.sql
 	cp $< temp.psv
 	sqlite3 -batch :memory: '.read filesizes.sql'
 	mv temp.psv $*.summary.psv
+	mv temp.unmapped $*.unmapped
 
-%.pdf: %.summary.psv
+%.pdf: %.summary.psv filesize.r
 	cp $< temp.psv
 	R --no-save -f filesize.r
 	mv temp.pdf $@
-	mv temp.unmapped $*.unmapped
 	rm temp.psv
 
-%.mimetypes.txt %.storage.txt: %.psv log10.so
+%.mimetypes.txt %.storage.txt: %.psv mimetypes.sql log10.so
 	cp $< temp.psv
 	sqlite3 -batch :memory: '.read mimetypes.sql'
 	mv temp.mimetypes.txt $*.mimetypes.txt

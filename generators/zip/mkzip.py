@@ -63,7 +63,7 @@ for bin in bins:
 	else:
 		raise Exception('how do you make a ' + format + '?')
 	while True:
-		name = '-'.join(random.choice(os.path.splitext(file)[0].split('-')) for file in selected)[:100]
+		name = '-'.join([random.choice(os.path.splitext(file)[0].split('-')) for file in selected][:4])[:100]
 		outname = outdir + '/' + name + '.' + format
 		if not os.path.isfile(outname):
 			break

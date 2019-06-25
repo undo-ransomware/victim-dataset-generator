@@ -39,6 +39,7 @@ for file in media/*.ogg; do
 	name="converted/${name%.*}"
 	[ -s "$name.m4a" ] || pffmpeg -i "$file" -c:a aac "$name.m4a"
 	[ -s "$name.mp3" ] || pffmpeg -i "$file" -c:a mp3 "$name.mp3"
+	[ -s "$name.wav" ] || pffmpeg -i "$file" -c:a pcm_u8 -ar 4000 -ac 1 "$name.wav"
 done
 for file in media/*.{webm,ogv}; do
 	ext=${file##*.}

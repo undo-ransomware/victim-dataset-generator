@@ -70,5 +70,8 @@ for bin in bins:
 	cmd.append(outname)
 	for file in selected:
 		cmd.append(indir + '/' + file)
+		yaml = os.path.splitext(file)[0] + '.yaml'
+		if os.path.isfile(indir + '/' + yaml):
+			cmd.append(indir + '/' + yaml)
 	subprocess.call(cmd)
 	print 'made', outname, os.stat(outname).st_size, total_bytes

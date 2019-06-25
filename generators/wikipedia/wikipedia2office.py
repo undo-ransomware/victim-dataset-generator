@@ -45,7 +45,7 @@ def convert(xml, sinks, metalog, source):
 				# SVG is not supported by PIL
 				# GIF tends to be animated, which invariably doesn't work
 				continue
-			localname = "media/" + slugify(basename, max_length=150) + ext
+			localname = "cache/" + slugify(basename, max_length=150) + ext
 			file = commons.images[src]
 			meta = file.text()
 			if '{{cc-zero' not in meta.lower() and '{{pd-' not in meta.lower():

@@ -50,4 +50,4 @@ class TextDocument:
 		p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
 	def save(self, filename):
-		self.document.save(filename + ".docx")
+		self.document.save('media/' + filename + '.docx')

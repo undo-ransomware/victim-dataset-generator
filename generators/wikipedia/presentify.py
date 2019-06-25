@@ -72,4 +72,4 @@ class Presentation:
 			p.font.size = Pt(size)
 
 	def save(self, filename):
-		self.pptx.save(filename + ".pptx")
+		self.pptx.save('media/' + filename + '.pptx')

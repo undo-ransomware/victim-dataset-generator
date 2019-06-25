@@ -84,14 +84,18 @@ class Sampler:
 			selected.append(file)
 		return (selected, bytes)
 	
+	def frac(self, x):
+		num, den = x.split('/')
+		return float(num) / float(den)
+	
 	def get_files(self, quota_file, max_bytes):
 		selected = []
 		total = 0
 		with io.open(quota_file, 'r') as file:
 			for row in csv.DictReader(file, delimiter='|'):
-				files, bytes = self.get_files_for_ext(row['ext'], float(row['fraction']) * max_bytes)
+				fraction = self.frac(row['class_fraction']) * self.frac(row['type_fraction'])
+				files, bytes = self.get_files_for_ext(row['ext'], fraction * max_bytes)
 				total += bytes
-				print '##',files
 				selected.append(files)
 		return [f for fs in selected for f in fs], total
 

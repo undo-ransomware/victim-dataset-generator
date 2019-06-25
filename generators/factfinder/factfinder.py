@@ -48,7 +48,7 @@ def download(session, info):
 		time.sleep(1)
 	# and finally, download file to disk and unpack
 	data = session.get(DOWNLOAD + '/deliver?reservationId=' + rid + '&_ts=' + ts)
-	zipfile = "media/" + product_key + '-' + rid + '.zip'
+	zipfile = "zips/" + product_key + '-' + rid + '.zip'
 	with io.open(zipfile, 'wb') as zip:
 		zip.write(data.content)
 	with ZipFile(zipfile, 'r') as zip:

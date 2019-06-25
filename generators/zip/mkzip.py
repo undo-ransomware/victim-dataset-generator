@@ -46,7 +46,6 @@ for bin in bins:
 	selected = []
 	while bytes < total_bytes:
 		dbb = int(round(10 * math.log10(total_bytes - bytes))) - 2
-		print total_bytes, bytes, dbb
 		file, size = files.sample(dbb)
 		if size == 0:
 			break
@@ -71,6 +70,5 @@ for bin in bins:
 	cmd.append(outname)
 	for file in selected:
 		cmd.append(indir + '/' + file)
-	print cmd
 	subprocess.call(cmd)
 	print 'made', outname, os.stat(outname).st_size, total_bytes

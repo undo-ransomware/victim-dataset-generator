@@ -14,7 +14,7 @@ def link(text, href, tail):
 	return a
 
 def download(page_title):
-	if os.path.isfile(page_title + ".html"):
+	if os.path.isfile('media/' + page_title + '.html'):
 		return
 
 	r = requests.get("https://en.wikipedia.org/api/rest_v1/page/html/" + quote(page_title))
@@ -35,7 +35,7 @@ def download(page_title):
 	p.append(link("Version as of " + str(datetime.now()) + ".", rev, ""))
 	body.append(p)
 
-	with io.open(page_title + ".html", 'w', encoding='utf-8') as html:
+	with io.open('media/' + page_title + '.html', 'w', encoding='utf-8') as html:
 		html.write(u"<!DOCTYPE html>")
 		html.write(etree.tostring(xml).decode("utf-8"))
 

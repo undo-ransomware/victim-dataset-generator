@@ -8,7 +8,7 @@ import os
 import io
 from datetime import datetime
 from slugify import slugify
-from urllib import quote
+from urllib import quote, unquote
 from tempfile import mkstemp
 from PIL import Image
 from resizeimage import resizeimage
@@ -38,11 +38,11 @@ def convert(xml, sinks, metalog, source):
 			res = figure.xpath(".//a//img/@resource")
 			if len(res) == 0:
 				continue
-			src = re.sub('^.*?File:', '', res[0])
+			src = unquote(re.sub('^.*?File:', '', res[0]))
 
 			basename, ext = os.path.splitext(src)
-			if ext.lower() in ['.svg', '.gif']:
-				# SVG is not supported by PIL
+			if ext.lower() in ['.svg', '.gif','.webp']:
+				# SVG and WEBP is not supported by PIL
 				# GIF tends to be animated, which invariably doesn't work
 				continue
 			localname = "cache/" + slugify(basename, max_length=150) + ext
@@ -72,15 +72,15 @@ def convert(xml, sinks, metalog, source):
 
 def record_metadata(metalog, site, filename):
 	metalog.write(u"source: " + site + "\n")
-	metalog.write(u"file: " + filename + "\n")
+	metalog.write(u"file: " + filename.decode('utf-8') + "\n")
 	metalog.write(u"date: " + str(datetime.now()) + "\n")
 
 def download(page_title):
-	if os.path.isfile(page_title + ".yaml"):
+	if os.path.isfile('media/' + page_title + ".yaml"):
 		return
 
 	sinks = [Presentation(), TextDocument()]
-	with io.open(page_title + ".yaml", 'w', encoding='utf-8') as metalog:
+	with io.open('media/' + page_title + ".yaml", 'w', encoding='utf-8') as metalog:
 		r = requests.get("https://en.wikipedia.org/api/rest_v1/page/html/" + quote(page_title))
 		xml = etree.fromstring(r.text)
 		rev = xml.xpath("/html/@about")[0]

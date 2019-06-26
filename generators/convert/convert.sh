@@ -6,7 +6,6 @@ for file in media/*.docx; do
 	name="converted/${name%.docx}"
 	[ -s "$name.md" ] || pandoc -f docx -t markdown -o "$name.md" "$file"
 	[ -s "$name.tex" ] || pandoc -f docx -t latex -o "$name.tex" "$file"
-	[ -s "$name.html" ] || pandoc -f docx -t html -o "$name.html" "$file"
 	[ -s "$name.doc" ] || libreoffice --convert-to 'doc:MS Word 97' --outdir converted "$file"
 	[ -s "$name.odt" ] || libreoffice --convert-to odt:writer8 --outdir converted "$file"
 	[ -s "$name.pdf" ] || libreoffice --convert-to pdf:writer_pdf_Export --outdir converted "$file"

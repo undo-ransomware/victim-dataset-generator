@@ -17,5 +17,5 @@ for file in selected:
 	print file
 	os.link(indir + '/' + file, outdir + '/' + file)
 	yaml = os.path.splitext(file)[0] + '.yaml'
-	if os.path.isfile(indir + '/' + yaml):
+	if os.path.isfile(indir + '/' + yaml) and not os.path.isfile(outdir + '/' + yaml):
 		os.link(indir + '/' + yaml, outdir + '/' + yaml)

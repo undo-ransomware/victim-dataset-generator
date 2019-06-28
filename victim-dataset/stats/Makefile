@@ -1,4 +1,4 @@
-TARGETS=$(foreach inst,uni fratz,$(inst).pdf $(inst).summary.psv $(inst).mimetypes.txt $(inst).storage.txt)
+TARGETS=$(foreach inst,uni fratz,$(inst).pdf $(inst).summary.psv $(inst).mimetypes.txt $(inst).storage.txt) mime_map.py
 
 all: $(TARGETS)
 
@@ -26,3 +26,6 @@ clean:
 
 log10.so: log10.c
 	gcc -fPIC -shared $^ -o $@ -lm
+
+mime_map.py: mime_map.sql
+	sqlite3 -batch :memory: '.read mime_map.sql'

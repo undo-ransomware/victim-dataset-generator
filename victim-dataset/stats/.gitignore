@@ -5,3 +5,4 @@ temp.*
 *.mimetypes.txt
 *.storage.txt
 log10.so
+mime_map.py

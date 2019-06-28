@@ -2,22 +2,24 @@
 #sudo apt install libreoffice pandoc ffmpeg
 
 for file in media/*.docx; do
-	name="${file##*/}"
-	name="converted/${name%.docx}"
-	[ -s "$name.md" ] || pandoc -f docx -t markdown -o "$name.md" "$file"
-	[ -s "$name.tex" ] || pandoc -f docx -t latex -o "$name.tex" "$file"
-	[ -s "$name.doc" ] || libreoffice --convert-to 'doc:MS Word 97' --outdir converted "$file"
-	[ -s "$name.odt" ] || libreoffice --convert-to odt:writer8 --outdir converted "$file"
-	[ -s "$name.pdf" ] || libreoffice --convert-to pdf:writer_pdf_Export --outdir converted "$file"
-	# use libreoffice to convert to .txt because pandoc generates plaintext with markup
-	[ -s "$name.txt" ] || libreoffice --convert-to txt:Text --outdir converted "$file"
-	# create additional, smaller office files from plaintext files because the originals
-	# don't get smaller than ~40k (python-docx's predefined styles). these won't get YAML
-	# provenance metadata files, but without images all licensing stuff is in the main file
-	# anyway.
-	[ -s "${name}.small.docx" ] || libreoffice --convert-to 'small.docx:MS Word 2007 XML' --outdir converted "$name.txt"
-	[ -s "${name}.small.doc" ] || libreoffice --convert-to 'small.doc:MS Word 97' --outdir converted "$name.txt"
-	[ -s "${name}.small.odt" ] || libreoffice --convert-to small.odt:writer8 --outdir converted "$name.txt"
+	if [ "$file" != "${file%.small.docx}.small.docx" ]; then
+		name="${file##*/}"
+		name="converted/${name%.docx}"
+		[ -s "$name.md" ] || pandoc -f docx -t markdown -o "$name.md" "$file"
+		[ -s "$name.tex" ] || pandoc -f docx -t latex -o "$name.tex" "$file"
+		[ -s "$name.doc" ] || libreoffice --convert-to 'doc:MS Word 97' --outdir converted "$file"
+		[ -s "$name.odt" ] || libreoffice --convert-to odt:writer8 --outdir converted "$file"
+		[ -s "$name.pdf" ] || libreoffice --convert-to pdf:writer_pdf_Export --outdir converted "$file"
+		# use libreoffice to convert to .txt because pandoc generates plaintext with markup
+		[ -s "$name.txt" ] || libreoffice --convert-to txt:Text --outdir converted "$file"
+		# create additional, smaller office files from plaintext files because the originals
+		# don't get smaller than ~40k (python-docx's predefined styles). these won't get YAML
+		# provenance metadata files, but without images all licensing stuff is in the main file
+		# anyway.
+		[ -s "${name}.small.docx" ] || libreoffice --convert-to 'small.docx:MS Word 2007 XML' --outdir converted "$name.txt"
+		[ -s "${name}.small.doc" ] || libreoffice --convert-to 'small.doc:MS Word 97' --outdir converted "$name.txt"
+		[ -s "${name}.small.odt" ] || libreoffice --convert-to small.odt:writer8 --outdir converted "$name.txt"
+	fi
 done
 for file in media/*.pptx; do
 	name="${file##*/}"

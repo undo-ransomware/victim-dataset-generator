@@ -25,7 +25,7 @@ def recurse(dir):
 		if len(ext) > 4:
 			ext = '...'
 
-		size = os.stat(dir + '/' + file).st_size
+		size = os.stat(file).st_size
 		if size == 0:
 			dbb = -1
 		else:

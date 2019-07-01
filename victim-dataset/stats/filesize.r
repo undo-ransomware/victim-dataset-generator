@@ -64,3 +64,11 @@ mkplot(c('zip','tgz','rar'), 'archives', c(30, 105))
 mkplot(c('m4a','mp3','ogg','wav','mp4','mts','ogv','webm'), 'media files', c(40, 95))
 mkplot(c('html','js','css','gif','php','png','svg'), 'curiosities: saved websites and probable website resources', c(17, 60))
 mkplot(c('c','py','java'), 'curiosities: source code')
+
+# select sum(count) as count, dbb, 'all' as ext from files
+# where ext <> '(unidentified)' group by dbb
+files = files[files$ext != '(unidentified)',]
+files = aggregate(files$count, list(dbb=files$dbb), sum)
+colnames(files) = c('dbb','count')
+files$ext = c('all')
+mkplot(c('all'), 'overall filesize distribution')

@@ -41,16 +41,17 @@ def convert(xml, sinks, metalog, source):
 			src = unquote(re.sub('^.*?File:', '', res[0]))
 
 			basename, ext = os.path.splitext(src)
-			if ext.lower() in ['.svg', '.gif','.webp']:
+			if ext.lower() in ['.svg', '.gif','.webp','.pdf']:
 				# SVG and WEBP is not supported by PIL
 				# GIF tends to be animated, which invariably doesn't work
+				# PDFs also exist in some articles
 				continue
 			localname = "cache/" + slugify(basename, max_length=150) + ext
 			file = commons.images[src]
 			meta = file.text()
 			if '{{cc-zero' not in meta.lower() and '{{pd-' not in meta.lower():
 				# we only use public-domain images to avoid dealing with attribution
-				# or, worse, stuff that's only 
+				# or, worse, stuff that's "Fair Use for English Wikipedia" only
 				continue
 			if not os.path.isfile(localname):
 				with open(localname, 'wb') as fd:

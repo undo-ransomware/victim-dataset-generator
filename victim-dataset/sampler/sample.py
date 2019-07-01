@@ -8,11 +8,11 @@ import sys
 
 args = sys.argv[1:]
 if len(args) != 5:
-	print 'usage: python sample.py input-dir output-dir ../stats/foo.summary.psv quota.psv mbytes'
+	print 'usage: python sample.py input-dir output-dir ../stats/foo.summary.psv quota-module-without-.py mbytes'
 	sys.exit(1)
 indir, outdir, summary, quota, mbytes = args
 
-selected, total = Sampler(summary, FileFactory(indir)).get_files(quota, 1000000 * int(mbytes))
+selected, total = Sampler(summary, FileFactory(indir), quota).get_files(1000000 * int(mbytes))
 for file in selected:
 	print file
 	os.link(indir + '/' + file, outdir + '/' + file)

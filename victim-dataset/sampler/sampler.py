@@ -4,6 +4,7 @@ import random
 import os
 import math
 import sys
+import importlib
 
 BINS = 128
 DEPTH = 6
@@ -16,7 +17,7 @@ def fill_tree(tree):
 		tree.append([tree[i][j] + tree[i][j+1] for j in range(0, len(tree[i])-1, 2)])
 
 class Sampler:
-	def __init__(self, stats_filename, files):
+	def __init__(self, stats_filename, files, quota_module):
 		self.files = files
 		self.stats = dict()
 		with io.open(stats_filename, 'r') as file:
@@ -35,6 +36,21 @@ class Sampler:
 			fill_tree(self.reservoir[ext])
 			fill_tree(self.accum[ext])
 
+		self.quota = dict()
+		importlib.import_module(quota_module).quota(self)
+
+	def combine(self, *exts):
+		total = init_tree();
+		fill_tree(total)
+		for depth in range(len(total)):
+			for dbb in range(len(total[depth])):
+				total[depth][dbb] = sum(self.stats[ext][depth][dbb] for ext in exts)
+		for ext in exts:
+			self.stats[ext] = total
+
+	def sample(self, ext, class_fraction, type_fraction):
+		self.quota[ext] = class_fraction * type_fraction
+
 	def get_file(self, ext, limit):
 		depth = DEPTH
 		index = 0
@@ -49,7 +65,7 @@ class Sampler:
 				return abs(statsLeft / statsTotal - left / accumTotal) + abs(statsRight / statsTotal - right / accumTotal)
 			errorLeft = error(accumLeft + 1, accumRight)
 			errorRight = error(accumLeft, accumRight + 1)
-			
+
 			size = 2 ** depth
 			#print >> sys.stderr, 'recurse', depth, index, 'left', accumLeft, statsLeft, errorLeft, 'right', accumRight, statsRight, errorRight, 'limit', limit, (index + 1) * size
 			recurse = -1
@@ -89,20 +105,14 @@ class Sampler:
 			bytes += size
 			selected.append(file)
 		return (selected, bytes)
-	
-	def frac(self, x):
-		num, den = x.split('/')
-		return float(num) / float(den)
-	
-	def get_files(self, quota_file, max_bytes):
+
+	def get_files(self, max_bytes):
 		selected = []
 		total = 0
-		with io.open(quota_file, 'r') as file:
-			for row in csv.DictReader(file, delimiter='|'):
-				fraction = self.frac(row['class_fraction']) * self.frac(row['type_fraction'])
-				files, bytes = self.get_files_for_ext(row['ext'], fraction * max_bytes)
-				total += bytes
-				selected.append(files)
+		for ext in self.quota.keys():
+			files, bytes = self.get_files_for_ext(ext, self.quota[ext] * max_bytes)
+			total += bytes
+			selected.append(files)
 		return [f for fs in selected for f in fs], total
 
 class FileFactory:
@@ -116,7 +126,7 @@ class FileFactory:
 			if size == 0:
 				print >> sys.stderr, file, 'is empty!'
 				continue
-			
+
 			dbb = int(round(10 * math.log10(size)))
 			if ext not in self.files:
 				self.files[ext] = [[] for x in range(BINS)]

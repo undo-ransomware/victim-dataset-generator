@@ -13,6 +13,8 @@ def init_tree():
 	return [[0 for x in range(BINS)]]
 
 def fill_tree(tree):
+	if len(tree) > 1:
+		return
 	for i in range(DEPTH):
 		tree.append([tree[i][j] + tree[i][j+1] for j in range(0, len(tree[i])-1, 2)])
 
@@ -31,22 +33,23 @@ class Sampler:
 		self.reservoir = dict((ext, [[self.files.count(ext, dbb) for dbb in range(BINS)]])
 				for ext in self.stats.keys())
 		self.accum = dict((ext, init_tree()) for ext in self.stats.keys())
+		self.quota = dict()
+		importlib.import_module(quota_module).quota(self)
 		for ext in self.stats.keys():
 			fill_tree(self.stats[ext])
 			fill_tree(self.reservoir[ext])
 			fill_tree(self.accum[ext])
 
-		self.quota = dict()
-		importlib.import_module(quota_module).quota(self)
-
 	def combine(self, *exts):
-		total = init_tree();
-		fill_tree(total)
-		for depth in range(len(total)):
-			for dbb in range(len(total[depth])):
-				total[depth][dbb] = sum(self.stats[ext][depth][dbb] for ext in exts)
+		total = init_tree()
+		for dbb in range(BINS):
+			total[0][dbb] = sum(self.stats[ext][0][dbb] for ext in exts)
 		for ext in exts:
 			self.stats[ext] = total
+
+	def filter(self, ext, new_count):
+		for dbb in range(BINS):
+			self.stats[ext][0][dbb] = new_count(dbb, self.stats[ext][0][dbb])
 
 	def sample(self, ext, class_fraction, type_fraction):
 		self.quota[ext] = class_fraction * type_fraction

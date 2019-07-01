@@ -14,6 +14,7 @@ def quota(s):
 	s.sample('odp', office, 4/25.)
 
 	img = 15/40.
+	s.filter('png', lambda dbb, count: count if dbb >= 40 else 0)
 	s.sample('jpg', img, 5/10.)
 	s.sample('png', img, 2/10.)
 	s.sample('pdf', img, 3/10.)
@@ -28,6 +29,8 @@ def quota(s):
 	s.sample('rar', media, 1/8.)
 
 	plain = 1/40.
+	s.combine('md', 'txt', 'tex')
+	s.combine('svg', 'xml')
 	s.sample('txt', plain, 1/8.)
 	s.sample('md', plain, 1/8.)
 	s.sample('tex', plain, 1/8.)

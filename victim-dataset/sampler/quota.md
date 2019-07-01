@@ -25,6 +25,7 @@
 	- 2 parts Microsoft XML
 	- 2 parts OpenOffice / LibreOffice XML (as per "open stuff" above)
 	- 1 part Microsoft legacy
+- combine OpenDocument and Microsoft XML, then draw from combined frequencies
 
 | type  | files | size   | parts    |
 |-------|-------|--------|----------|
@@ -48,6 +49,9 @@
 	- almost impossible to create the way printer-scanners create them
 	- entropy-wise, these should look mostly like either PNG or JPEG
 - slightly overrepresenting JPEG because it's much more common in private clouds
+- remove small (<10k) PNGs
+	- they otherwise dominate the category
+	- they're almost certainly website assets for saved websites
 
 | type  | files | size  | parts                              |
 |-------|-------|-------|------------------------------------|
@@ -95,6 +99,7 @@
 	- HTML is probably saved websites, so not that important
 	- using 1 part `tex` because it's similar to `rtf`
 	- using 1 part `md` because of NextCloud editor integration
+	- combine statistics for `md`, `txt` and `tex`, then draw from combined frequencies
 - we have plenty `csv` but that has significantly different entropy (numbers)
 - using SVG for XML, hoping it is somewhat representative
 

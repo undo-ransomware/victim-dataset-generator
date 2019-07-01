@@ -4,39 +4,58 @@ import random
 import os
 import math
 import sys
+import importlib
+
+BINS = 128
+DEPTH = 6
+
+def init_tree():
+	return [[0 for x in range(BINS)]]
+
+def fill_tree(tree):
+	if len(tree) > 1:
+		return
+	for i in range(DEPTH):
+		tree.append([tree[i][j] + tree[i][j+1] for j in range(0, len(tree[i])-1, 2)])
 
 class Sampler:
-	BINS = 128
-	DEPTH = 6
-	
-	def init_tree(self):
-		return [[0 for x in range(self.BINS)]]
-
-	def fill_tree(self, tree):
-		for i in range(self.DEPTH):
-			tree.append([tree[i][j] + tree[i][j+1] for j in range(0, len(tree[i])-1, 2)])
-
-	def __init__(self, stats_filename, files):
+	def __init__(self, stats_filename, files, quota_module):
 		self.files = files
 		self.stats = dict()
 		with io.open(stats_filename, 'r') as file:
 			for row in csv.DictReader(file, delimiter='|'):
 				ext = row['ext']
 				if ext not in self.stats:
-					self.stats[ext] = self.init_tree()
+					self.stats[ext] = init_tree()
 				dbb = int(row['dbb'])
 				self.stats[ext][0][dbb] = int(row['count'])
 
-		self.reservoir = dict((ext, [[self.files.count(ext, dbb) for dbb in range(self.BINS)]])
+		self.reservoir = dict((ext, [[self.files.count(ext, dbb) for dbb in range(BINS)]])
 				for ext in self.stats.keys())
-		self.accum = dict((ext, self.init_tree()) for ext in self.stats.keys())
+		self.accum = dict((ext, init_tree()) for ext in self.stats.keys())
+		self.quota = dict()
+		importlib.import_module(quota_module).quota(self)
 		for ext in self.stats.keys():
-			self.fill_tree(self.stats[ext])
-			self.fill_tree(self.reservoir[ext])
-			self.fill_tree(self.accum[ext])
+			fill_tree(self.stats[ext])
+			fill_tree(self.reservoir[ext])
+			fill_tree(self.accum[ext])
 
-	def get_file(self, ext):
-		depth = self.DEPTH
+	def combine(self, *exts):
+		total = init_tree()
+		for dbb in range(BINS):
+			total[0][dbb] = sum(self.stats[ext][0][dbb] for ext in exts)
+		for ext in exts:
+			self.stats[ext] = total
+
+	def filter(self, ext, new_count):
+		for dbb in range(BINS):
+			self.stats[ext][0][dbb] = new_count(dbb, self.stats[ext][0][dbb])
+
+	def sample(self, ext, class_fraction, type_fraction):
+		self.quota[ext] = class_fraction * type_fraction
+
+	def get_file(self, ext, limit):
+		depth = DEPTH
 		index = 0
 		while True:
 			accumLeft = self.accum[ext][depth][index]
@@ -49,17 +68,20 @@ class Sampler:
 				return abs(statsLeft / statsTotal - left / accumTotal) + abs(statsRight / statsTotal - right / accumTotal)
 			errorLeft = error(accumLeft + 1, accumRight)
 			errorRight = error(accumLeft, accumRight + 1)
-			
-			#print >> sys.stderr, 'recurse', depth, index, 'left', accumLeft, statsLeft, errorLeft, 'right', accumRight, statsRight, errorRight
+
+			size = 2 ** depth
+			#print >> sys.stderr, 'recurse', depth, index, 'left', accumLeft, statsLeft, errorLeft, 'right', accumRight, statsRight, errorRight, 'limit', limit, (index + 1) * size
 			recurse = -1
-			if errorLeft < errorRight:
+			if errorLeft < errorRight or (index + 1) * size > limit:
 				recurse = index
+				if statsLeft == 0:
+					print >> sys.stderr, '!! cannot sample', ext, 'from empty bins', recurse * size, '..', (recurse + 1) * size - 1
+					return (None, None)
 				#print >> sys.stderr, 'to the left', index, recurse
 			else:
 				recurse = index + 1
 				#print >> sys.stderr, 'to the right', index, recurse
 			if self.reservoir[ext][depth][recurse] == 0:
-				size = 2 ** depth
 				print >> sys.stderr, '!! need more', ext, 'in bins', recurse * size, '..', (recurse + 1) * size - 1
 				recurse ^= 1 # to the other side instead
 				if self.reservoir[ext][depth][recurse] == 0:
@@ -69,9 +91,9 @@ class Sampler:
 			self.accum[ext][depth][recurse] += 1
 			self.reservoir[ext][depth][recurse] -= 1
 			if depth == 0:
-				file, size = self.files.sample(ext, recurse)
-				print >> sys.stderr, 'sampling bin', recurse, file, size
-				return (file, size)
+				file, bytes = self.files.sample(ext, recurse)
+				print >> sys.stderr, 'sampling bin', recurse, file, bytes
+				return (file, bytes)
 			depth = depth - 1
 			index = 2 * recurse
 
@@ -79,24 +101,21 @@ class Sampler:
 		bytes = 0
 		selected = []
 		while bytes < max_bytes:
-			file, size = self.get_file(ext)
+			limit = 10 * math.log10(max_bytes - bytes)
+			file, size = self.get_file(ext, limit)
+			if file is None:
+				break
 			bytes += size
 			selected.append(file)
 		return (selected, bytes)
-	
-	def frac(self, x):
-		num, den = x.split('/')
-		return float(num) / float(den)
-	
-	def get_files(self, quota_file, max_bytes):
+
+	def get_files(self, max_bytes):
 		selected = []
 		total = 0
-		with io.open(quota_file, 'r') as file:
-			for row in csv.DictReader(file, delimiter='|'):
-				fraction = self.frac(row['class_fraction']) * self.frac(row['type_fraction'])
-				files, bytes = self.get_files_for_ext(row['ext'], fraction * max_bytes)
-				total += bytes
-				selected.append(files)
+		for ext in self.quota.keys():
+			files, bytes = self.get_files_for_ext(ext, self.quota[ext] * max_bytes)
+			total += bytes
+			selected.append(files)
 		return [f for fs in selected for f in fs], total
 
 class FileFactory:
@@ -110,10 +129,10 @@ class FileFactory:
 			if size == 0:
 				print >> sys.stderr, file, 'is empty!'
 				continue
-			
+
 			dbb = int(round(10 * math.log10(size)))
 			if ext not in self.files:
-				self.files[ext] = [[] for x in range(Sampler.BINS)]
+				self.files[ext] = [[] for x in range(BINS)]
 			self.files[ext][dbb].append((file, size))
 
 	def sample(self, ext, dbb):

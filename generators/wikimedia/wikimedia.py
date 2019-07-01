@@ -77,7 +77,10 @@ def download_search_random(query, count):
 		download(re.sub('^File:', '', title))
 
 def main(args):
-	if args[0] == 'random':
+	if args[0] == 'file':
+		for i in args:
+			download(i)
+	elif args[0] == 'random':
 		print 'Downloading ' + args[1] + ' random files.'
 		for i in range(int(args[1])):
 			download_random_file()
@@ -95,6 +98,7 @@ def main(args):
 		print 'Downloading ' + args[2] + ' files matching ' + args[1]
 		download_search_random(args[1], int(args[2]))
 	else:
+		print "file <filename...>"
 		print "random <number of random files>"
 		print "category <wikimedia category>"
 		print "randomcat <wikimedia category> <number of random files>"

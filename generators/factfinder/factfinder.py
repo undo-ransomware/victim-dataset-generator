@@ -3,7 +3,9 @@ import json
 import time
 import sys
 import io
+import os
 import random
+from datetime import datetime
 from zipfile import ZipFile
 
 # pulls data from https://factfinder.census.gov/
@@ -12,6 +14,7 @@ from zipfile import ZipFile
 SITE = 'https://factfinder.census.gov'
 DOWNLOAD = SITE + '/rest/downloadRequest'
 TABLE = SITE + '/tablerestful/tableServices'
+GEO = 'All Counties within United States and Puerto Rico~County~050~2018'
 
 def download(session, info):
 	# they probably have an API, but this was easier
@@ -26,7 +29,7 @@ def download(session, info):
 	# select data by County (this takes forever because it also returns search data)
 	session.post(SITE + '/rest/geoSearch/geoassist',
 		data={'log': 't', 'src': 'geoassist', 'param': 'geo', 'ga.summaryLevel': '050',
-			'selections':'All Counties within United States and Puerto Rico~County~050~2018'})
+			'selections': GEO})
 	session.get(TABLE + '/renderProductData?renderForMap=f&renderForChart=f&pid=' +
 		product_key + '&log=t&_ts=' + ts)
 	# get a download slot and start download
@@ -55,6 +58,16 @@ def download(session, info):
 		zip.extract(product_key + '_with_ann.csv', path='media')
 		zip.extract(product_key + '_metadata.csv', path='media')
 		zip.extract(product_key + '.txt', path='media')
+
+	metalog = 'media/' + product_key + '.yaml'
+	with io.open(metalog, 'w', encoding='utf-8') as fd:
+		fd.write(u"source: " + SITE + "\n")
+		fd.write(u"file: " + product_key + "\n")
+		fd.write(u"product-selection: " + infokey + "\n")
+		fd.write(u"geo-selection: " + GEO + "\n")
+		fd.write(u"date: " + str(datetime.now()) + "\n")
+	os.link(metalog, 'media/' + product_key + '_with_ann.yaml')
+	os.link(metalog, 'media/' + product_key + '_metadata.yaml')
 
 def download_index(session):
 	# select data by County

@@ -55,5 +55,5 @@ for file in media/*.{webm,ogv}; do
 	[ -s "$name.webm" ] || [ $ext == webm ] || pffmpeg -i "$file" -c:v libvpx-vp9 -c:a libopus -y "$name.webm"
 	[ -s "$name.ogv" ] || [ $ext == ogv ] || pffmpeg -i "$file" -c:v libtheora -c:a libvorbis -y "$name.ogv"
 	[ -s "$name.mp4" ] || pffmpeg -i "$file" -c:v h264 -c:a aac -y "$name.mp4"
-	[ -s "$name.mts" ] || pffmpeg -i "$file" -c:v mpeg2video -c:a ac3 -f vob -y "$name.mts"
+	[ -s "$name.mts" ] || pffmpeg -i "$file" -c:v mpeg2video -c:a ac3 -f mpegts -y "$name.mts"
 done

@@ -3,7 +3,7 @@ chardet==3.0.4
 Django==1.11.20
 idna==2.8
 image==1.5.27
-numpy==1.16.2
+numpy==1.22.0
 Pillow==5.4.1
 pytz==2018.9
 requests==2.21.0
